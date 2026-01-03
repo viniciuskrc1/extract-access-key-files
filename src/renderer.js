@@ -1,13 +1,13 @@
 // Using electronAPI exposed by preload.js
 
 // Elements
-const btnSelectFiles = document.getElementById('btnSelectFiles');
-const btnCopyAll = document.getElementById('btnCopyAll');
-const listView = document.getElementById('listView');
-const status = document.getElementById('status');
-const count = document.getElementById('count');
-const progressIndicator = document.getElementById('progressIndicator');
-const container = document.querySelector('.container');
+const btnSelectFilesEl = document.getElementById('btnSelectFiles');
+const btnCopyAllEl = document.getElementById('btnCopyAll');
+const listViewEl = document.getElementById('listView');
+const statusEl = document.getElementById('status');
+const countEl = document.getElementById('count');
+const progressIndicatorEl = document.getElementById('progressIndicator');
+const containerEl = document.querySelector('.container');
 
 let accessKeys = [];
 let selectedIndex = -1;
@@ -16,7 +16,7 @@ let selectedIndex = -1;
 updateCount();
 
 // File selection
-btnSelectFiles.addEventListener('click', async () => {
+btnSelectFilesEl.addEventListener('click', async () => {
     if (window.electronAPI) {
         const filePaths = await window.electronAPI.openFileDialog();
         if (filePaths && filePaths.length > 0) {
@@ -26,7 +26,7 @@ btnSelectFiles.addEventListener('click', async () => {
 });
 
 // Copy all
-btnCopyAll.addEventListener('click', () => {
+btnCopyAllEl.addEventListener('click', () => {
     if (accessKeys.length === 0) {
         showAlert('Nenhuma chave para copiar', 'A lista está vazia.');
         return;
@@ -34,31 +34,18 @@ btnCopyAll.addEventListener('click', () => {
     
     const allKeys = accessKeys.join('\n');
     copyToClipboard(allKeys);
-    status.textContent = 'Todas as chaves copiadas para a área de transferência!';
-});
-
-// List item double click to copy
-listView.addEventListener('dblclick', (e) => {
-    const li = e.target.closest('li');
-    if (li) {
-        const index = Array.from(listView.children).indexOf(li);
-        if (index >= 0 && accessKeys[index]) {
-            copyToClipboard(accessKeys[index]);
-            status.textContent = 'Chave copiada para a área de transferência!';
-            // Visual feedback
-            li.style.background = '#d4e6f1';
-            setTimeout(() => {
-                li.style.background = '';
-            }, 200);
-        }
-    }
+    statusEl.textContent = 'Todas as chaves copiadas para a área de transferência!';
 });
 
 // List item click (select)
-listView.addEventListener('click', (e) => {
+listViewEl.addEventListener('click', (e) => {
+    // Não selecionar se clicar no botão de copiar
+    if (e.target.closest('.copy-btn')) {
+        return;
+    }
     const li = e.target.closest('li');
     if (li) {
-        const index = Array.from(listView.children).indexOf(li);
+        const index = Array.from(listViewEl.children).indexOf(li);
         selectItem(index);
     }
 });
@@ -69,28 +56,28 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         if (accessKeys[selectedIndex]) {
             copyToClipboard(accessKeys[selectedIndex]);
-            status.textContent = 'Chave copiada para a área de transferência!';
+            statusEl.textContent = 'Chave copiada para a área de transferência!';
         }
     }
 });
 
 // Drag and drop
-container.addEventListener('dragover', (e) => {
+containerEl.addEventListener('dragover', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    container.classList.add('drag-over');
+    containerEl.classList.add('drag-over');
 });
 
-container.addEventListener('dragleave', (e) => {
+containerEl.addEventListener('dragleave', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    container.classList.remove('drag-over');
+    containerEl.classList.remove('drag-over');
 });
 
-container.addEventListener('drop', async (e) => {
+containerEl.addEventListener('drop', async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    container.classList.remove('drag-over');
+    containerEl.classList.remove('drag-over');
     
     const files = Array.from(e.dataTransfer.files).filter(file => 
         file.name.toLowerCase().endsWith('.pdf')
@@ -100,16 +87,16 @@ container.addEventListener('drop', async (e) => {
         const filePaths = files.map(f => f.path);
         processFiles(filePaths);
     } else {
-        status.textContent = 'Nenhum arquivo PDF encontrado nos arquivos arrastados.';
+        statusEl.textContent = 'Nenhum arquivo PDF encontrado nos arquivos arrastados.';
     }
 });
 
 async function processFiles(filePaths) {
-    btnSelectFiles.disabled = true;
-    progressIndicator.style.display = 'block';
-    status.textContent = 'Processando arquivos...';
+    btnSelectFilesEl.disabled = true;
+    progressIndicatorEl.style.display = 'block';
+    statusEl.textContent = 'Processando arquivos...';
     accessKeys = [];
-    listView.innerHTML = '';
+    listViewEl.innerHTML = '';
     updateCount();
     
     const extractedKeys = [];
@@ -118,7 +105,7 @@ async function processFiles(filePaths) {
         const filePath = filePaths[i];
         const fileName = filePath.split(/[/\\]/).pop();
         
-        status.textContent = `Processando ${i + 1} de ${filePaths.length}: ${fileName}`;
+        statusEl.textContent = `Processando ${i + 1} de ${filePaths.length}: ${fileName}`;
         
         try {
             console.log(`\n=== Processando: ${fileName} ===`);
@@ -141,25 +128,57 @@ async function processFiles(filePaths) {
     // Update UI
     accessKeys = extractedKeys;
     updateListView();
-    btnSelectFiles.disabled = false;
-    progressIndicator.style.display = 'none';
+    btnSelectFilesEl.disabled = false;
+    progressIndicatorEl.style.display = 'none';
     
     if (extractedKeys.length === 0) {
-        status.textContent = 'Nenhuma Chave de Acesso encontrada nos arquivos.';
+        statusEl.textContent = 'Nenhuma Chave de Acesso encontrada nos arquivos.';
     } else {
-        status.textContent = `Processamento concluído! ${extractedKeys.length} chave(s) encontrada(s).`;
+        statusEl.textContent = `Processamento concluído! ${extractedKeys.length} chave(s) encontrada(s).`;
     }
 }
 
 function updateListView() {
-    listView.innerHTML = '';
+    listViewEl.innerHTML = '';
     accessKeys.forEach((key, index) => {
         const li = document.createElement('li');
-        li.textContent = key;
+        
+        // Criar container para a chave e o botão
+        const keyContainer = document.createElement('div');
+        keyContainer.className = 'key-container';
+        
+        // Texto da chave
+        const keyText = document.createElement('span');
+        keyText.className = 'key-text';
+        keyText.textContent = key;
+        
+        // Botão de copiar
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.innerHTML = '📋';
+        copyBtn.title = 'Copiar chave';
+        copyBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evitar que o clique no botão selecione o item
+            copyToClipboard(key);
+            statusEl.textContent = 'Chave copiada para a área de transferência!';
+            
+            // Feedback visual
+            copyBtn.innerHTML = '✓';
+            copyBtn.style.background = '#4caf50';
+            setTimeout(() => {
+                copyBtn.innerHTML = '📋';
+                copyBtn.style.background = '';
+            }, 1000);
+        });
+        
+        keyContainer.appendChild(keyText);
+        keyContainer.appendChild(copyBtn);
+        li.appendChild(keyContainer);
+        
         if (index === selectedIndex) {
             li.classList.add('selected');
         }
-        listView.appendChild(li);
+        listViewEl.appendChild(li);
     });
     updateCount();
 }
@@ -167,13 +186,13 @@ function updateListView() {
 function selectItem(index) {
     selectedIndex = index;
     updateListView();
-    if (index >= 0 && listView.children[index]) {
-        listView.children[index].scrollIntoView({ block: 'nearest' });
+    if (index >= 0 && listViewEl.children[index]) {
+        listViewEl.children[index].scrollIntoView({ block: 'nearest' });
     }
 }
 
 function updateCount() {
-    count.textContent = `Total: ${accessKeys.length} chave(s)`;
+    countEl.textContent = `Total: ${accessKeys.length} chave(s)`;
 }
 
 function copyToClipboard(text) {

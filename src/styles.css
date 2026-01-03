@@ -183,6 +183,45 @@ header h1 {
     font-weight: 600;
 }
 
+.key-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+}
+
+.key-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.copy-btn {
+    background: #3498db;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 6px 10px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 32px;
+}
+
+.copy-btn:hover {
+    background: #2980b9;
+    transform: scale(1.05);
+}
+
+.copy-btn:active {
+    transform: scale(0.95);
+}
+
 footer {
     padding: 15px 30px;
     background: #f8f9fa;

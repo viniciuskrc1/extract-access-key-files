@@ -6,9 +6,7 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
-    "build:win": "electron-packager . ExtractAccessKey --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"node_modules/electron-builder|src/main/java|build.gradle|settings.gradle|gradlew|gradlew.bat|gradle|run.ps1|setup-wrapper.ps1|.git|build|dist|README.md\" --asar",
-    "build:win:optimized": "npm run build:win && powershell -Command \"$localesPath = 'dist\\ExtractAccessKey-win32-x64\\locales'; $keep = @('pt-BR.pak', 'en-US.pak', 'en-GB.pak'); Get-ChildItem -Path $localesPath -Filter '*.pak' | Where-Object { $keep -notcontains $_.Name } | Remove-Item -Force; Write-Host 'Locales otimizados (mantidos apenas pt-BR, en-US, en-GB)'\"",
-    "build:win:zip": "npm run build:win:optimized && powershell -Command \"Compress-Archive -Path 'dist\\ExtractAccessKey-win32-x64' -DestinationPath 'dist\\ExtractAccessKey-win32-x64.zip' -Force; $size = [math]::Round((Get-Item 'dist\\ExtractAccessKey-win32-x64.zip').Length / 1MB, 2); Write-Host ('ZIP criado: dist\\ExtractAccessKey-win32-x64.zip (' + $size + ' MB)')\"",
+    "build:win": "electron-packager . ExtractAccessKey --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"node_modules/electron-builder|.git|dist|README.md\"",
     "dist": "electron-builder --publish=never"
   },
   "keywords": [
