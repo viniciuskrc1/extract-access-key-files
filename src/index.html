@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extrator de Chave de Acesso</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Extrator de Chave de Acesso</h1>
+            <div class="count" id="count">Total: 0 chave(s)</div>
+        </header>
+        
+        <div class="separator"></div>
+        
+        <div class="controls">
+            <button id="btnSelectFiles" class="btn btn-primary">Selecionar Arquivos PDF</button>
+            <button id="btnCopyAll" class="btn btn-success">Copiar Todos</button>
+            <div class="progress-container">
+                <div id="progressIndicator" class="progress-indicator" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <label class="list-label">Chaves de Acesso Extraídas:</label>
+            <div id="listContainer" class="list-container">
+                <ul id="listView" class="list-view"></ul>
+            </div>
+        </div>
+        
+        <footer>
+            <div id="status" class="status">Selecione os arquivos PDF ou arraste-os para cá</div>
+        </footer>
+    </div>
+    
+    <script src="renderer.js"></script>
+</body>
+</html>
+
